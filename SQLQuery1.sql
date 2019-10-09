@@ -97,43 +97,59 @@ CREATE OR ALTER FUNCTION ufn_IsWordComprised(@setOfLetters VARCHAR(50), @word VA
 RETURNS BIT
 AS
 BEGIN
-	DECLARE @validCharsCount INT = 0;
-	DECLARE @setIndex INT = 1;
-
-	WHILE @setIndex < LEN(@setOfLetters) + 1
+	DECLARE @setIndex INT = 1
+	DECLARE @validCharsCount INT = 0
+	DECLARE @checkedChars VARCHAR(50)
+	WHILE(@setIndex < LEN(@setOfLetters) + 1)
 	BEGIN
-		DECLARE @wordIndex INT = 1
-
-		WHILE @wordIndex < LEN(@word) + 1
+		DECLARE @hasNotBeenChecked INT = 1
+		DECLARE @checkedIndex INT = 1
+		WHILE(@checkedIndex < LEN(@checkedChars) + 1)
 		BEGIN
-			
-			IF(SUBSTRING(@setOfLetters,@setIndex,1) = SUBSTRING(@word,@wordIndex,1))
+			IF(SUBSTRING(@checkedChars,@checkedIndex,1) = SUBSTRING(@setOfLetters,@setIndex,1))
 			BEGIN
-				SET @validCharsCount = @validCharsCount + 1
+				SET @hasNotBeenChecked = 0
 			END
 
-			SET @wordIndex = @wordIndex + 1
+			SET @checkedIndex = @checkedIndex + 1
 		END
+		IF(@hasNotBeenChecked = 1)
+		BEGIN
 
-		SET @setIndex = @setIndex + 1
+			DECLARE @wordIndex INT = 1
+			WHILE(@wordIndex < LEN(@word) + 1)
+			BEGIN
+				
+				IF(SUBSTRING(@setOfLetters,@setIndex,1) = SUBSTRING(@word,@wordIndex,1))
+				BEGIN
+					SET @validCharsCount = @validCharsCount + 1
+				END
+				
+				SET @wordIndex = @wordIndex + 1
+			END
+			SET @checkedChars = CONCAT(@checkedChars,SUBSTRING(@setOfLetters,@setIndex,1))
+		END
+	SET @setIndex = @setIndex + 1
 	END
 	DECLARE @result BIT
-
 	IF(@validCharsCount = LEN(@word))
 	BEGIN
-		SET @result = 1;
+		SET @result = 1
 	END
 	ELSE
 	BEGIN
 		SET @result = 0
 	END
-	
 	RETURN @result
 END
 
-SELECT dbo.ufn_IsWordComprised('oistmiahf','Sofia')
+SELECT dbo.ufn_IsWordComprised('pppp','Guy')
 
 
+
+---------  ^
+--DEBUG 7  |
+---------  V
 DECLARE @owi INT = 1
 WHILE @owi < LEN('oistmiahf') + 1
 
@@ -154,3 +170,9 @@ BEGIN
 
 	SET @owi = @owi + 1
 END
+
+DECLARE @addToMe VARCHAR(50)
+
+SET @addToMe = CONCAT(@addToMe,'a')
+
+SELECT @addToMe
